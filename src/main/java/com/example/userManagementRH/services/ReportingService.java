@@ -46,6 +46,7 @@ public class ReportingService {
                         Collectors.summingInt(TimeSheet::getHoursWorked)
                 ));
     }
+    // fullName = firstName+lastName
 }
 
 
