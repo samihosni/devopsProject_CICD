@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/samihosni/devopsProject_CICD'
+                echo 'Cloning Repository ... !'
+                git url: 'https://github.com/samihosni/devopsProject_CICD.git'
             }
         }
 

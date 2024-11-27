@@ -1,0 +1,88 @@
+# PostgreSQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14  # Ensure the image version fits your needs
+          env:
+            - name: POSTGRES_DB
+              value: RH
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: ca1920
+          ports:
+            - containerPort: 5432
+
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+
+---
+# Spring Boot Application Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devopsprojectcicd-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devopsprojectcicd
+  template:
+    metadata:
+      labels:
+        app: devopsprojectcicd
+    spec:
+      containers:
+        - name: devopsprojectcicd
+          image: docker.io/samihosni/devopsprojectcicd:latest  # Make sure this image exists
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/RH  # PostgreSQL service name
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: ca1920
+            - name: SPRING_MAIL_HOST
+              value: localhost
+            - name: SPRING_MAIL_PORT
+              value: "1025"
+            - name: SPRING_MAIL_USERNAME
+              value: sami
+            - name: SPRING_MAIL_PASSWORD
+              value: ca1920
+          ports:
+            - containerPort: 8080
+
+---
+# Spring Boot Application Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: devopsprojectcicd-service
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: devopsprojectcicd
