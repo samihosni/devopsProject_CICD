@@ -9,18 +9,7 @@ pipeline {
         NEXUS_URL = 'http://localhost:8083'  // Set your Nexus server URL
         NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
     }
-    stages {
-        stage('Check Environment Variables') {
-            steps {
-                echo "DOCKER_HUB_CREDENTIALS: ${DOCKER_HUB_CREDENTIALS}"
-                echo "NEXUS_CREDENTIALS: ${NEXUS_CREDENTIALS}"
-                echo "IMAGE_NAME: ${IMAGE_NAME}"
-                echo "IMAGE_TAG: ${IMAGE_TAG}"
-                echo "NEXUS_URL: ${NEXUS_URL}"
-                echo "NEXUS_REPOSITORY: ${NEXUS_REPOSITORY}"
-            }
-        }
-    }
+
 
     stages {
         stage('📥 Checkout') {
