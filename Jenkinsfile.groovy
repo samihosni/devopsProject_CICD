@@ -3,11 +3,11 @@ pipeline {
     environment {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
-        NEXUS_CREDENTIALS = credentials('nexus-credentials ')  // Add Nexus credentials
-        IMAGE_NAME = 'samihosni/devopsproject_cicd-app '
+        NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
+        IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_URL = 'http://localhost:8083'  // Set your Nexus server URL
-        NEXUS_REPOSITORY = 'maven-snapshots'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
+        NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
     }
 
 
@@ -73,16 +73,13 @@ pipeline {
         // Add Nexus Deployment Stage
         stage('🔄 Deploy to Nexus') {
             steps {
-                script {
-                    echo 'Deploying the artifact to Nexus...'
-                    // Ensure Maven deploys to Nexus repository
-                    bat """
-                        mvn clean deploy -DskipTests \
-                        -DnexusUrl=${NEXUS_URL} \
-                        -DrepositoryId=${NEXUS_REPOSITORY} \
-                        -Durl=${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/
-                    """
-                }
+                echo 'Deploying to Nexus...'
+                bat """
+            mvn deploy -DskipTests \
+            -DnexusUsername=${NEXUS_CREDENTIALS_USR} \
+            -DnexusPassword=${NEXUS_CREDENTIALS_PSW} \
+            -Durl=${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/
+        """
             }
         }
     }
