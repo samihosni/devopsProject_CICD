@@ -7,7 +7,7 @@ pipeline {
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app '
         IMAGE_TAG = 'latest'
         NEXUS_URL = 'http://localhost:8083'  // Set your Nexus server URL
-        NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
+        NEXUS_REPOSITORY = 'maven-snapshots'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
     }
 
 
