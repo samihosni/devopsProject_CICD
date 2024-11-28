@@ -2,17 +2,16 @@ pipeline {
     agent any
     environment {
         // Add SonarQube and Docker Hub credentials
-        SONARQUBE_SERVER = 'sq1' // Replace with your SonarQube server name in Jenkins
-        SONARQUBE_TOKEN = credentials('jenkins-Sonar') // Replace with your SonarQube token ID
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub') // Replace with your Docker Hub credentials ID
-        IMAGE_NAME = 'lindaboukhit/station-ski'
+
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+        IMAGE_NAME = 'samihosni/devopsproject_cicd-app '
         IMAGE_TAG = 'latest'
     }
     stages {
         stage('📥 Checkout') {
             steps {
                 echo 'Cloning the repository...'
-                git url: 'https://github.com/khiari-aymen/erp-bi5-opsight-station-ski.git', branch: 'LindaBOUKHIT-5bi5-opsight'
+                git url: 'https://github.com/samihosni/devopsProject_CICD.git', branch: 'master'
             }
         }
 
@@ -30,29 +29,6 @@ pipeline {
             }
         }
 
-        stage('📊 JaCoCo Report') {
-            steps {
-                jacoco(
-                        execPattern: '**/jacoco.exec',
-                        classPattern: '**/classes',
-                        sourcePattern: '**/src/main/java'
-                )
-            }
-        }
-
-        stage('🔍 SonarQube Analysis') {
-            steps {
-                echo 'Analyzing the project with SonarQube...'
-                withSonarQubeEnv('sq1') {
-                    sh '''
-                    mvn sonar:sonar \
-                        -Dsonar.login=$SONARQUBE_TOKEN \
-                        -Dsonar.projectKey=erp-bi5-opsight-station-ski \
-                        -Dsonar.host.url=http://192.168.50.4:9000/
-                    '''
-                }
-            }
-        }
 
         stage('🏗️ Build') {
             steps {
@@ -61,13 +37,6 @@ pipeline {
             }
         }
 
-        stage('🧪 Test') {
-            steps {
-                echo 'Running tests...'
-                // Uncomment the following line to enable tests
-                // sh 'mvn test'
-            }
-        }
 
         stage('🐳 Build Docker Image') {
             steps {
@@ -104,7 +73,7 @@ pipeline {
         success {
             echo 'Build and analysis completed successfully!'
             emailext(
-                    to: "linda.boukhit@esprit.tn",
+                    to: "samy.hosni@gmail.com",
                     subject: "🎉 Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
                     body: """
@@ -112,7 +81,7 @@ pipeline {
                         <body style="background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90sm-yM3GhbgHIE-mTLUBrYYMsoZDiCj50yw&usqp=CAU');">
                             <div style="background-color: rgba(255, 255, 255, 0.85); padding: 20px; border-radius: 10px;">
                                 <h2 style="color: #4CAF50;">🎉 Jenkins Build Succeeded!</h2>
-                                <p>Bonjour Linda Boukhit,</p>
+                                <p>Bonjour Sami El HOSNI,</p>
                                 <p>Le build de votre projet s'est terminé avec succès. Voici les détails :</p>
                                 <ul style="list-style: none; padding: 0;">
                                     <li><strong>Project:</strong> ${env.JOB_NAME}</li>
@@ -144,7 +113,7 @@ pipeline {
                         <body style="background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90sm-yM3GhbgHIE-mTLUBrYYMsoZDiCj50yw&usqp=CAU');">
                             <div style="background-color: rgba(255, 255, 255, 0.85); padding: 20px; border-radius: 10px;">
                                 <h2 style="color: #FF0000;">🚨 Jenkins Build Failed!</h2>
-                                <p>Bonjour Linda Boukhit,</p>
+                                <p>Bonjour Sami El HOSNI,</p>
                                 <p>Le build de votre projet a échoué. Voici les détails :</p>
                                 <ul style="list-style: none; padding: 0;">
                                     <li><strong>Project:</strong> ${env.JOB_NAME}</li>
