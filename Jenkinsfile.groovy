@@ -18,14 +18,14 @@ pipeline {
         stage('🧹 Clean') {
             steps {
                 echo 'Cleaning the project...'
-                sh 'mvn clean'
+                bat 'mvn clean'
             }
         }
 
         stage('⚙️ Compile') {
             steps {
                 echo 'Compiling the project...'
-                sh 'mvn compile'
+                bat 'mvn compile'
             }
         }
 
@@ -33,7 +33,7 @@ pipeline {
         stage('🏗️ Build') {
             steps {
                 echo 'Building the project...'
-                sh 'mvn clean deploy -DskipTests'
+                bat 'mvn clean deploy -DskipTests'
             }
         }
 
@@ -41,7 +41,7 @@ pipeline {
         stage('🐳 Build Docker Image') {
             steps {
                 echo 'Building Docker Image...'
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
@@ -49,9 +49,9 @@ pipeline {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
-                    sh "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker logout"
+                    bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
+                    bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    bat "docker logout"
                 }
             }
         }
@@ -61,14 +61,14 @@ pipeline {
                 echo 'Deploying the application with Docker Compose...'
                 script {
                     // Windows-compatible background process (using 'start' command)
-                    sh "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
+                    bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
 
                     // Ensuring Docker Compose runs in the background
                     // This will work on Windows since 'start' is used to launch commands in the background
-                    sh 'start docker-compose down'
-                    sh 'start docker-compose up -d'
+                    bat 'start docker-compose down'
+                    bat 'start docker-compose up -d'
 
-                    sh "docker logout"
+                    bat "docker logout"
                 }
             }
         }
