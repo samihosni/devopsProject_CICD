@@ -1,12 +1,15 @@
 pipeline {
     agent any
     environment {
-        // Add SonarQube and Docker Hub credentials
-
+        // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+        NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app '
         IMAGE_TAG = 'latest'
+        NEXUS_URL = 'http://your-nexus-server'  // Set your Nexus server URL
+        NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
     }
+
     stages {
         stage('📥 Checkout') {
             steps {
@@ -29,14 +32,12 @@ pipeline {
             }
         }
 
-
         stage('🏗️ Build') {
             steps {
                 echo 'Building the project...'
                 bat 'mvn clean deploy -DskipTests'
             }
         }
-
 
         stage('🐳 Build Docker Image') {
             steps {
@@ -60,15 +61,26 @@ pipeline {
             steps {
                 echo 'Deploying the application with Docker Compose...'
                 script {
-                    // Windows-compatible background process (using 'start' command)
                     bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-
-                    // Ensuring Docker Compose runs in the background
-                    // This will work on Windows since 'start' is used to launch commands in the background
                     bat 'start docker-compose down'
                     bat 'start docker-compose up -d'
-
                     bat "docker logout"
+                }
+            }
+        }
+
+        // Add Nexus Deployment Stage
+        stage('🔄 Deploy to Nexus') {
+            steps {
+                script {
+                    echo 'Deploying the artifact to Nexus...'
+                    // Ensure Maven deploys to Nexus repository
+                    bat """
+                        mvn clean deploy -DskipTests \
+                        -DnexusUrl=${NEXUS_URL} \
+                        -DrepositoryId=${NEXUS_REPOSITORY} \
+                        -Durl=${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/
+                    """
                 }
             }
         }
