@@ -98,7 +98,7 @@ pipeline {
                         <body style="background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90sm-yM3GhbgHIE-mTLUBrYYMsoZDiCj50yw&usqp=CAU');">
                             <div style="background-color: rgba(255, 255, 255, 0.85); padding: 20px; border-radius: 10px;">
                                 <h2 style="color: #4CAF50;">🎉 Jenkins Build Succeeded!</h2>
-                                <p>Bonjour Sami El HOSNI,</p>
+                                <p>Bonjour Mr. Sami El HOSNI,</p>
                                 <p>Le build de votre projet s'est terminé avec succès. Voici les détails :</p>
                                 <ul style="list-style: none; padding: 0;">
                                     <li><strong>Project:</strong> ${env.JOB_NAME}</li>
