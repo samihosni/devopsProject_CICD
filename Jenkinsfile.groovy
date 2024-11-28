@@ -74,7 +74,7 @@ pipeline {
             echo 'Build and analysis completed successfully!'
             emailext(
                     to: "samy.hosni@gmail.com",
-                    subject: "🎉 Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    subject: "🎉 Build SUCCESS !: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
                     body: """
                     <html>
