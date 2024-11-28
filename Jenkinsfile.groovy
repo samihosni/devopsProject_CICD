@@ -60,9 +60,14 @@ pipeline {
             steps {
                 echo 'Deploying the application with Docker Compose...'
                 script {
+                    // Windows-compatible background process (using 'start' command)
                     sh "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+
+                    // Ensuring Docker Compose runs in the background
+                    // This will work on Windows since 'start' is used to launch commands in the background
+                    sh 'start docker-compose down'
+                    sh 'start docker-compose up -d'
+
                     sh "docker logout"
                 }
             }
@@ -105,7 +110,7 @@ pipeline {
         failure {
             echo 'Build or analysis failed.'
             emailext(
-                    to: "linda.boukhit@esprit.tn",
+                    to: "samy.hosni@gmail.com",
                     subject: "🚨 Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
                     body: """
