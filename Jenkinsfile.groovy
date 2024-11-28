@@ -3,7 +3,7 @@ pipeline {
     environment {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
-        NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
+        NEXUS_CREDENTIALS = credentials(' ')  // Add Nexus credentials
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app '
         IMAGE_TAG = 'latest'
         NEXUS_URL = 'http://your-nexus-server'  // Set your Nexus server URL
