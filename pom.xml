@@ -112,11 +112,11 @@
     <!-- Distribution Management to configure Nexus deployment -->
     <distributionManagement>
         <repository>
-            <id>nexus-releases</id>
+            <id>maven-releases</id>
             <url>http://localhost:8083/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>nexus-snapshots</id>
+            <id>maven-snapshots</id>
             <url>http://localhost:8083/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
