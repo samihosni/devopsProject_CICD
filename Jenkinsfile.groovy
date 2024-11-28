@@ -3,11 +3,23 @@ pipeline {
     environment {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
-        NEXUS_CREDENTIALS = credentials(' ')  // Add Nexus credentials
+        NEXUS_CREDENTIALS = credentials('nexus-credentials ')  // Add Nexus credentials
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app '
         IMAGE_TAG = 'latest'
-        NEXUS_URL = 'http://your-nexus-server'  // Set your Nexus server URL
+        NEXUS_URL = 'http://localhost:8083'  // Set your Nexus server URL
         NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
+    }
+    stages {
+        stage('Check Environment Variables') {
+            steps {
+                echo "DOCKER_HUB_CREDENTIALS: ${DOCKER_HUB_CREDENTIALS}"
+                echo "NEXUS_CREDENTIALS: ${NEXUS_CREDENTIALS}"
+                echo "IMAGE_NAME: ${IMAGE_NAME}"
+                echo "IMAGE_TAG: ${IMAGE_TAG}"
+                echo "NEXUS_URL: ${NEXUS_URL}"
+                echo "NEXUS_REPOSITORY: ${NEXUS_REPOSITORY}"
+            }
+        }
     }
 
     stages {
