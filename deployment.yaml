@@ -1,51 +1,9 @@
-# PostgreSQL Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: app-deployment
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-        - name: postgres
-          image: postgres:14  # Ensure the image version fits your needs
-          env:
-            - name: POSTGRES_DB
-              value: RH
-            - name: POSTGRES_USER
-              value: postgres
-            - name: POSTGRES_PASSWORD
-              value: ca1920
-          ports:
-            - containerPort: 5432
-
----
-# PostgreSQL Service
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-service
-spec:
-  ports:
-    - port: 5432
-  selector:
-    app: postgres
-
----
-# Spring Boot Application Deployment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: devopsprojectcicd-deployment
-spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: devopsprojectcicd
@@ -55,34 +13,55 @@ spec:
         app: devopsprojectcicd
     spec:
       containers:
-        - name: devopsprojectcicd
-          image: docker.io/samihosni/devopsprojectcicd:latest  # Make sure this image exists
-          env:
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres-service:5432/RH  # PostgreSQL service name
-            - name: SPRING_DATASOURCE_USERNAME
-              value: postgres
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: ca1920
-            - name: SPRING_MAIL_HOST
-              value: localhost
-            - name: SPRING_MAIL_PORT
-              value: "1025"
-            - name: SPRING_MAIL_USERNAME
-              value: sami
-            - name: SPRING_MAIL_PASSWORD
-              value: ca1920
+        - name: app
+          image: samihosni/devopsprojectcicd:latest
           ports:
             - containerPort: 8080
-
 ---
-# Spring Boot Application Service
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: devopsprojectcicd-service
+  name: db-deployment
 spec:
-  ports:
-    - port: 8080
+  replicas: 1
   selector:
-    app: devopsprojectcicd
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db
+          image: postgres:latest
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: ca1920
+            - name: POSTGRES_DB
+              value: RH
+          ports:
+            - containerPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maildev-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maildev
+  template:
+    metadata:
+      labels:
+        app: maildev
+    spec:
+      containers:
+        - name: maildev
+          image: maildev/maildev
+          ports:
+            - containerPort: 1080
+            - containerPort: 1025
