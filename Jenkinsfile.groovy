@@ -61,12 +61,15 @@ pipeline {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
-                    bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    bat "docker logout"
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        bat "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                        bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        bat "docker logout"
+                    }
                 }
             }
         }
+
 
         stage('🚀 Deploy with Docker Compose') {
             steps {
