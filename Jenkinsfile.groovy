@@ -6,7 +6,7 @@ pipeline {
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION='nexus3'
-        NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
+        NEXUS_CREDENTIALS = 'nexus-credentials'  // Add Nexus credentials
         NEXUS_PROTOCOL= 'http'
         NEXUS_URL = 'localhost:8083'  // Set your Nexus server URL
         NEXUS_REPOSITORY = 'devOpsProject'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
