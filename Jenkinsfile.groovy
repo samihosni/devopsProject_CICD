@@ -3,6 +3,8 @@ pipeline {
     environment {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = 'docker-hub'
+        DOCKER_HUB_CREDENTIALS_PSW ='0549757418Samsoum.'
+        DOCKER_HUB_CREDENTIALS_USR ='samihosni'
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION='nexus3'
