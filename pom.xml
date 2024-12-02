@@ -113,7 +113,7 @@
     <distributionManagement>
         <repository>
             <id>maven-releases</id>
-            <url>http://localhost:8083/repository/maven-releases/</url>
+            <url>https://76e4-197-25-102-188.ngrok-free.app/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
