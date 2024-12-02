@@ -24,6 +24,7 @@ pipeline {
 
         stage('🧹 Clean') {
             steps {
+
                 echo 'Cleaning the project...'
                 bat 'mvn clean'
             }
@@ -39,7 +40,10 @@ pipeline {
         stage('🏗️ Build') {
             steps {
                 echo 'Building the project...'
-                bat 'mvn clean deploy -DskipTests'
+                configFileProvider([configFile(fileId: '1f62a59a-5aea-4522-8445-886f83159aea', variable: 'mavenconfig')]) {
+
+                bat 'mvn -s $mavenconfig clean deploy -DskipTests=true'
+                }
             }
         }
 
