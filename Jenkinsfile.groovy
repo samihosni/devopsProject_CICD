@@ -3,8 +3,6 @@ pipeline {
     environment {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = 'docker-hub'
-        DOCKER_HUB_CREDENTIALS_PSW ='0549757418Samsoum.'
-        DOCKER_HUB_CREDENTIALS_USR ='samy.hosni@gmail.com'
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION='nexus3'
@@ -61,23 +59,32 @@ pipeline {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
-                    bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    bat "docker logout"
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        bat """
+                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                docker logout
+                """
+                    }
                 }
             }
         }
+
 
         stage('🚀 Deploy with Docker Compose') {
             steps {
                 echo 'Deploying the application with Docker Compose...'
                 script {
-                    bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    bat 'start docker-compose down'
-                    bat 'start docker-compose up -d'
-                    bat "docker logout"
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        bat """
+                     "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+                     'start docker-compose down'
+                     'start docker-compose up -d'
+                     "docker logout"
+                     """
                 }
             }
+        }
         }
 
         // Add Nexus Deployment Stage
