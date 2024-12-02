@@ -6,7 +6,7 @@ pipeline {
         NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
-        NEXUS_URL = 'http://localhost:8083'  // Set your Nexus server URL
+        NEXUS_URL = 'https://76e4-197-25-102-188.ngrok-free.app'  // Set your Nexus server URL
         NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
     }
 
