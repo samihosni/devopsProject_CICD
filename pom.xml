@@ -109,7 +109,13 @@
         </dependency>
     </dependencies>
 
-
+    <!-- Distribution Management to configure Nexus deployment -->
+    <distributionManagement>
+        <repository>
+            <id>devOpsProject</id>
+            <url>http://localhost:8083/repository/devOpsProject/</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
