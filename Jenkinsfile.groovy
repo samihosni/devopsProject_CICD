@@ -3,11 +3,14 @@ pipeline {
     environment {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
-        NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
-        NEXUS_URL = 'https://76e4-197-25-102-188.ngrok-free.app/repository/maven-releases/'  // Set your Nexus server URL
-        NEXUS_REPOSITORY = 'maven-releases'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
+        NEXUS_VERSION='nexus3'
+        NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Add Nexus credentials
+        NEXUS_PROTOCOL= 'http'
+        NEXUS_URL = 'localhost:8083'  // Set your Nexus server URL
+        NEXUS_REPOSITORY = 'devOpsProject'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
+        ARTIFACT_VESRION='${BUILD_NUMBER}'
     }
 
 
@@ -71,15 +74,44 @@ pipeline {
         }
 
         // Add Nexus Deployment Stage
-        stage('🔄 Deploy to Nexus') {
+        stage("publish to nexus") {
             steps {
-                echo 'Deploying to Nexus...'
-                bat """
-            mvn deploy -DskipTests \
-            -DnexusUsername=${NEXUS_CREDENTIALS_USR} \
-            -DnexusPassword=${NEXUS_CREDENTIALS_PSW} \
-            -Durl=${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/
-        """
+                script {
+                    // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
+                    pom = readMavenPom file: "pom.xml"
+                    // Find built artifact under target folder
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
+                    // Print some info from the artifact found
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    // Extract the path from the File found
+                    artifactPath = filesByGlob[0].path
+                    // Assign to a boolean response verifying If the artifact name exists
+                    artifactExists = fileExists artifactPath
+
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}"
+
+                        nexusArtifactUploader(
+                                nexusVersion: NEXUS_VERSION,
+                                protocol: NEXUS_PROTOCOL,
+                                nexusUrl: NEXUS_URL,
+                                groupId: pom.groupId,
+                                version: ARTIFACT_VERSION,
+                                repository: NEXUS_REPOSITORY,
+                                credentialsId: NEXUS_CREDENTIAL_ID,
+                                artifacts: [
+                                        // Artifact generated such as .jar, .ear and .war files.
+                                        [artifactId: pom.artifactId,
+                                         classifier: '',
+                                         file: artifactPath,
+                                         type: pom.packaging]
+                                ]
+                        )
+
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found"
+                    }
+                }
             }
         }
     }

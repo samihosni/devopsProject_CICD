@@ -109,13 +109,7 @@
         </dependency>
     </dependencies>
 
-    <!-- Distribution Management to configure Nexus deployment -->
-    <distributionManagement>
-        <repository>
-            <id>maven-releases</id>
-            <url>https://76e4-197-25-102-188.ngrok-free.app/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
+
 
     <build>
         <plugins>
