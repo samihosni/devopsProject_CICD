@@ -4,7 +4,7 @@ pipeline {
         // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = 'docker-hub'
         DOCKER_HUB_CREDENTIALS_PSW ='0549757418Samsoum.'
-        DOCKER_HUB_CREDENTIALS_USR ='samihosni'
+        DOCKER_HUB_CREDENTIALS_USR ='samy.hosni@gmail.com'
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION='nexus3'
@@ -61,15 +61,12 @@ pipeline {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        bat "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
-                        bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                        bat "docker logout"
-                    }
+                    bat "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
+                    bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    bat "docker logout"
                 }
             }
         }
-
 
         stage('🚀 Deploy with Docker Compose') {
             steps {
