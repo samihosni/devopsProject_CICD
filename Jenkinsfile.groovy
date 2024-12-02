@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         // Add Nexus credentials and Docker Hub credentials
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+        DOCKER_HUB_CREDENTIALS = 'docker-hub'
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION='nexus3'
