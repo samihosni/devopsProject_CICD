@@ -105,7 +105,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: pom.version,
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: NEXUS_CREDENTIAL_ID,
+                            credentialsId: NEXUS_CREDENTIAL,
                             artifacts: [[artifactId: pom.artifactId, classifier: '', file: artifactPath, type: pom.packaging]]
                     )
                 }
