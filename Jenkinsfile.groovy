@@ -59,7 +59,7 @@ pipeline {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'dockers', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         bat """
                 echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin 
                 docker push ${IMAGE_NAME}:${IMAGE_TAG} 
@@ -76,7 +76,7 @@ pipeline {
             steps {
                 echo 'Deploying the application with Docker Compose...'
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'dockers', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         bat """
                 echo %DOCKER_PASS%| docker login -u %DOCKER_USER% --password-stdin
                 start docker-compose down
