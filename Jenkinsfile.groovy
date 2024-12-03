@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo 'Starting MailDev ...'
                 bat 'npm install -g maildev'
-                bat 'start maildev --smtp 1025 --web 1080'
+                bat 'start /B maildev --smtp 1025 --web 1080'
             }
         }
 
