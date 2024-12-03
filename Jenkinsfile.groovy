@@ -1,16 +1,18 @@
 pipeline {
     agent any
     environment {
+        // Add Nexus credentials and Docker Hub credentials
         DOCKER_HUB_CREDENTIALS = credentials('dockers')
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
-        NEXUS_VERSION = 'nexus3'
-        NEXUS_CREDENTIAL_ID = 'nexus-credentials' // Updated the correct variable name
-        NEXUS_PROTOCOL = 'http'
-        NEXUS_URL = 'localhost:8083' // Ensure this is accessible from Jenkins
-        NEXUS_REPOSITORY = 'devOpsProject'
-        ARTIFACT_VERSION = "${BUILD_NUMBER}" // Ensure proper usage of dynamic variable
+        NEXUS_VERSION='nexus3'
+        NEXUS_CREDENTIALS = 'nexus-credentials'  // Add Nexus credentials
+        NEXUS_PROTOCOL= 'http'
+        NEXUS_URL = 'localhost:8083'  // Set your Nexus server URL
+        NEXUS_REPOSITORY = 'devOpsProject'  // Set the Nexus repository to deploy (e.g., maven-releases or maven-snapshots)
+        ARTIFACT_VESRION='${BUILD_NUMBER}'
     }
+
 
     stages {
         stage('📥 Checkout') {
@@ -22,6 +24,7 @@ pipeline {
 
         stage('🧹 Clean') {
             steps {
+
                 echo 'Cleaning the project...'
                 bat 'mvn clean'
             }
@@ -38,7 +41,9 @@ pipeline {
             steps {
                 echo 'Building the project...'
                 configFileProvider([configFile(fileId: '1f62a59a-5aea-4522-8445-886f83159aea', variable: 'mavenconfig')]) {
+
                     bat "mvn -s %mavenconfig% clean deploy -DskipTests=true"
+
                 }
             }
         }
@@ -54,29 +59,35 @@ pipeline {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
-                    bat """
-                        echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
-                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
-                        docker logout
-                    """
+                        bat """
+                             echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
+                             docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                             docker logout
+                        """
+                    }
                 }
             }
-        }
+
+
+
 
         stage('🚀 Deploy with Docker Compose') {
             steps {
                 echo 'Deploying the application with Docker Compose...'
                 script {
-                    bat """
-                        echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
-                        docker-compose down
+                        bat """
+                         echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
+                         docker-compose down
                         docker-compose up -d
                         docker logout
-                    """
+                """
+                    }
                 }
             }
-        }
 
+
+
+        // Add Nexus Deployment Stage
         stage('Publish to Nexus') {
             steps {
                 script {
