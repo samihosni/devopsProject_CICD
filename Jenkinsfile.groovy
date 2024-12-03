@@ -88,26 +88,43 @@ pipeline {
 
 
         // Add Nexus Deployment Stage
-        stage('Publish to Nexus') {
+        stage("publish to nexus") {
             steps {
                 script {
-                    // Read POM file
-                    def pom = readMavenPom file: "pom.xml"
-                    def artifactPath = findFiles(glob: "target/*.${pom.packaging}")[0].path
+                    // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
+                    pom = readMavenPom file: "pom.xml"
+                    // Find built artifact under target folder
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
+                    // Print some info from the artifact found
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    // Extract the path from the File found
+                    artifactPath = filesByGlob[0].path
+                    // Assign to a boolean response verifying If the artifact name exists
+                    artifactExists = fileExists artifactPath
 
-                    echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version: ${pom.version}"
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}"
 
-                    // Upload artifact
-                    nexusArtifactUploader(
-                            nexusVersion: NEXUS_VERSION,
-                            protocol: NEXUS_PROTOCOL,
-                            nexusUrl: NEXUS_URL,
-                            groupId: pom.groupId,
-                            version: pom.version,
-                            repository: NEXUS_REPOSITORY,
-                            credentialsId: NEXUS_CREDENTIAL_ID,
-                            artifacts: [[artifactId: pom.artifactId, classifier: '', file: artifactPath, type: pom.packaging]]
-                    )
+                        nexusArtifactUploader(
+                                nexusVersion: NEXUS_VERSION,
+                                protocol: NEXUS_PROTOCOL,
+                                nexusUrl: NEXUS_URL,
+                                groupId: pom.groupId,
+                                version: ARTIFACT_VERSION,
+                                repository: NEXUS_REPOSITORY,
+                                credentialsId: NEXUS_CREDENTIAL_ID,
+                                artifacts: [
+                                        // Artifact generated such as .jar, .ear and .war files.
+                                        [artifactId: pom.artifactId,
+                                         classifier: '',
+                                         file: artifactPath,
+                                         type: pom.packaging]
+                                ]
+                        )
+
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found"
+                    }
                 }
             }
         }
@@ -115,21 +132,69 @@ pipeline {
 
     post {
         success {
-            echo 'Build and deployment completed successfully!'
+            echo 'Build and analysis completed successfully!'
             emailext(
                     to: "samy.hosni@gmail.com",
-                    subject: "🎉 Build SUCCESS! ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    subject: "🎉 Build SUCCESS !: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
-                    body: "The build of ${env.JOB_NAME} was successful. Build URL: ${env.BUILD_URL}"
+                    body: """
+                    <html>
+                        <body style="background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90sm-yM3GhbgHIE-mTLUBrYYMsoZDiCj50yw&usqp=CAU');">
+                            <div style="background-color: rgba(255, 255, 255, 0.85); padding: 20px; border-radius: 10px;">
+                                <h2 style="color: #4CAF50;">🎉 Jenkins Build Succeeded!</h2>
+                                <p>Bonjour Mr. Sami El HOSNI,</p>
+                                <p>Le build de votre projet s'est terminé avec succès. Voici les détails :</p>
+                                <ul style="list-style: none; padding: 0;">
+                                    <li><strong>Project:</strong> ${env.JOB_NAME}</li>
+                                    <li><strong>Build Number:</strong> ${env.BUILD_NUMBER}</li>
+                                    <li><strong>Status:</strong> <span style="color:green;"><strong>SUCCESS</strong></span></li>
+                                    <li><strong>Branch:</strong> ${env.GIT_BRANCH}</li>
+                                    <li><strong>Commit:</strong> ${env.GIT_COMMIT}</li>
+                                    <li><strong>Build Duration:</strong> ${currentBuild.durationString}</li>
+                                </ul>
+                                <p>Plus d'informations :</p>
+                                <ul style="list-style: none; padding: 0;">
+                                    <li><a href="${env.BUILD_URL}console" style="color: #1E90FF;">Console Output</a></li>
+                                    <li><a href="${env.BUILD_URL}changes" style="color: #1E90FF;">Changes</a></li>
+                                </ul>
+                            </div>
+                        </body>
+                    </html>
+                """
             )
         }
         failure {
-            echo 'Build or deployment failed.'
+            echo 'Build or analysis failed.'
             emailext(
                     to: "samy.hosni@gmail.com",
                     subject: "🚨 Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
-                    body: "The build of ${env.JOB_NAME} failed. Build URL: ${env.BUILD_URL}"
+                    body: """
+                    <html>
+                        <body style="background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90sm-yM3GhbgHIE-mTLUBrYYMsoZDiCj50yw&usqp=CAU');">
+                            <div style="background-color: rgba(255, 255, 255, 0.85); padding: 20px; border-radius: 10px;">
+                                <h2 style="color: #FF0000;">🚨 Jenkins Build Failed!</h2>
+                                <p>Bonjour Sami El HOSNI,</p>
+                                <p>Le build de votre projet a échoué. Voici les détails :</p>
+                                <ul style="list-style: none; padding: 0;">
+                                    <li><strong>Project:</strong> ${env.JOB_NAME}</li>
+                                    <li><strong>Build Number:</strong> ${env.BUILD_NUMBER}</li>
+                                    <li><strong>Status:</strong> <span style="color:red;"><strong>FAILURE</strong></span></li>
+                                    <li><strong>Branch:</strong> ${env.GIT_BRANCH}</li>
+                                    <li><strong>Commit:</strong> ${env.GIT_COMMIT}</li>
+                                    <li><strong>Build Duration:</strong> ${currentBuild.durationString}</li>
+                                </ul>
+                                <p>Plus d'informations :</p>
+                                <ul style="list-style: none; padding: 0;">
+                                    <li><a href="${env.BUILD_URL}console" style="color: #1E90FF;">Console Output</a></li>
+                                    <li><a href="${env.BUILD_URL}changes" style="color: #1E90FF;">Changes</a></li>
+                                    <li><a href="${env.BUILD_URL}testReport" style="color: #1E90FF;">Test Results</a></li>
+                                </ul>
+                                <p>Merci de vérifier les journaux de build pour plus de détails.</p>
+                            </div>
+                        </body>
+                    </html>
+                """
             )
         }
         always {
