@@ -34,14 +34,7 @@ pipeline {
             }
         }
 
-        stage('Starting MailDev'){
-            steps {
-                echo 'Starting MailDev ...'
-                script {
-                bat 'start /B maildev --smtp 1025 --web 1080'
-                }
-            }
-        }
+
 
         stage('🛠️ Unit Tests') {
             steps {
