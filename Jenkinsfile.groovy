@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         // Add Nexus credentials and Docker Hub credentials
-        DOCKER_HUB_CREDENTIALS = 'docker-hub'
+        DOCKER_HUB_CREDENTIALS = 'dockers'
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION='nexus3'
@@ -61,8 +61,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         bat """
-                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin || exit 1
-                docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed with error code: %ERRORLEVEL%"
+                echo %DOCKER_PASS% | docker login -u %{DOCKER_USER% --password-stdin 
+                docker push ${IMAGE_NAME}:${IMAGE_TAG} 
                 docker logout
                 """
                     }
