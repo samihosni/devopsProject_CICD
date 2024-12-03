@@ -5,11 +5,11 @@ pipeline {
         IMAGE_NAME = 'samihosni/devopsproject_cicd-app'
         IMAGE_TAG = 'latest'
         NEXUS_VERSION = 'nexus3'
-        NEXUS_CREDENTIAL_ID = 'nexus-credentials' // Updated the correct variable name
+        NEXUS_CREDENTIAL_ID = 'nexus-credentials'
         NEXUS_PROTOCOL = 'http'
-        NEXUS_URL = 'localhost:8083' // Ensure this is accessible from Jenkins
+        NEXUS_URL = 'localhost:8083'
         NEXUS_REPOSITORY = 'devOpsProject'
-        ARTIFACT_VERSION = "${BUILD_NUMBER}" // Ensure proper usage of dynamic variable
+        ARTIFACT_VERSION = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -31,6 +31,39 @@ pipeline {
             steps {
                 echo 'Compiling the project...'
                 bat 'mvn compile'
+            }
+        }
+
+        stage('Starting MailDev'){
+            steps {
+                echo 'Starting MailDev ...'
+                bat 'maildev'
+            }
+        }
+
+        stage('🛠️ Unit Tests') {
+            steps {
+                echo 'Running unit tests...'
+                bat 'mvn test -Dtest=*ServiceTest'
+            }
+            post {
+                always {
+                    echo 'Collecting unit test results...'
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('🌐 Integration Tests') {
+            steps {
+                echo 'Running integration tests...'
+                bat 'mvn test -Dtest=*RestControllerIT'
+            }
+            post {
+                always {
+                    echo 'Collecting integration test results...'
+                    junit '**/target/surefire-reports/*.xml'
+                }
             }
         }
 
@@ -80,13 +113,11 @@ pipeline {
         stage('Publish to Nexus') {
             steps {
                 script {
-                    // Read POM file
                     def pom = readMavenPom file: "pom.xml"
                     def artifactPath = findFiles(glob: "target/*.${pom.packaging}")[0].path
 
                     echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version: ${pom.version}"
 
-                    // Upload artifact
                     nexusArtifactUploader(
                             nexusVersion: NEXUS_VERSION,
                             protocol: NEXUS_PROTOCOL,
@@ -122,7 +153,7 @@ pipeline {
             )
         }
         always {
-            echo 'Cleaning up...'
+            echo 'Cleaning up workspace...'
         }
     }
 }
