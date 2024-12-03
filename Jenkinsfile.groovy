@@ -48,6 +48,22 @@ pipeline {
             }
         }
 
+        stage('🚀 Deploy with Docker Compose') {
+            steps {
+                echo 'Deploying the application with Docker Compose...'
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        bat """
+                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                start docker-compose down
+                start docker-compose up -d
+                docker logout
+                """
+                    }
+                }
+            }
+        }
+
         stage('🐳 Build Docker Image') {
             steps {
                 echo 'Building Docker Image...'
@@ -71,21 +87,7 @@ pipeline {
         }
 
 
-        stage('🚀 Deploy with Docker Compose') {
-            steps {
-                echo 'Deploying the application with Docker Compose...'
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        bat """
-                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                start docker-compose down
-                start docker-compose up -d
-                docker logout
-                """
-                    }
-                }
-            }
-        }
+
 
 
         // Add Nexus Deployment Stage
