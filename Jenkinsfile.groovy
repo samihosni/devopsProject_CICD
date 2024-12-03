@@ -60,11 +60,11 @@ pipeline {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        bat """
-                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                docker push ${IMAGE_NAME}:${IMAGE_TAG}
-                docker logout
-                """
+
+                      echo "${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+                        bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        bat "docker logout"
+
                     }
                 }
             }
