@@ -77,15 +77,16 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         bat """
-                     "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
-                     'start docker-compose down'
-                     'start docker-compose up -d'
-                     "docker logout"
-                     """
+                echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                start docker-compose down
+                start docker-compose up -d
+                docker logout
+                """
+                    }
                 }
             }
         }
-        }
+
 
         // Add Nexus Deployment Stage
         stage("publish to nexus") {
