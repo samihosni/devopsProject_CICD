@@ -39,7 +39,7 @@ pipeline {
         stage('🛠️ Unit Tests') {
             steps {
                 echo 'Running unit tests...'
-                bat 'mvn test -Dtest=*ServiceTest'
+                bat 'mvn test -Dtest=TimeSheetTestService'
             }
             post {
                 always {
@@ -52,7 +52,7 @@ pipeline {
         stage('🌐 Integration Tests') {
             steps {
                 echo 'Running integration tests...'
-                bat 'mvn test -Dtest=*RestControllerIT'
+                bat 'mvn test -Dtest=*TimeSheetTestRestController'
             }
             post {
                 always {
