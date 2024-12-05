@@ -15,6 +15,7 @@ services:
     depends_on:
       - db
       - maildev
+      - sonarqube # Ensure SonarQube starts first
 
   db:
     image: postgres:latest
@@ -30,3 +31,28 @@ services:
     ports:
       - "1080:1080" # Interface Web
       - "1025:1025" # SMTP
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000" # Access SonarQube at http://localhost:9000
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonar-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    depends_on:
+      - sonar-db
+
+  sonar-db:
+    image: postgres:latest
+    container_name: sonar-db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - sonar-db-data:/var/lib/postgresql/data
+
+volumes:
+  sonar-db-data:

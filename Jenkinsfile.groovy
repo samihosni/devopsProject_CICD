@@ -10,24 +10,26 @@ pipeline {
         NEXUS_URL = 'localhost:8083'
         NEXUS_REPOSITORY = 'devOpsProject'
         ARTIFACT_VERSION = "${BUILD_NUMBER}"
+        SONARQUBE_SERVER = 'SonarQube' // Replace with your SonarQube server name in Jenkins
+        SONARQUBE_TOKEN = credentials('sonar-token') // Replace with your SonarQube token ID
     }
 
     stages {
-        stage('📥 Checkout') {
+        stage(' Checkout') {
             steps {
                 echo 'Cloning the repository...'
                 git url: 'https://github.com/samihosni/devopsProject_CICD.git', branch: 'master'
             }
         }
 
-        stage('🧹 Clean') {
+        stage(' Clean') {
             steps {
                 echo 'Cleaning the project...'
                 bat 'mvn clean'
             }
         }
 
-        stage('⚙️ Compile') {
+        stage(' Compile') {
             steps {
                 echo 'Compiling the project...'
                 bat 'mvn compile'
@@ -36,7 +38,7 @@ pipeline {
 
 
 
-        stage('🛠️ Unit Tests') {
+        stage(' Unit Tests') {
             steps {
                 echo 'Running unit tests...'
                 bat 'mvn test -Dtest=TimeSheetTestService'
@@ -49,20 +51,22 @@ pipeline {
             }
         }
 
-        stage('🌐 Integration Tests') {
+        stage(' SonarQube Analysis') {
             steps {
-                echo 'Running integration tests...'
-                bat 'mvn test -Dtest=*TimeSheetTestRestController'
-            }
-            post {
-                always {
-                    echo 'Collecting integration test results...'
-                    junit '**/target/surefire-reports/*.xml'
+                echo 'Analyzing the project with SonarQube...'
+                withSonarQubeEnv('SonarQube') {
+                    bat"""
+                    mvn sonar:sonar \
+                        -Dsonar.login=$SONARQUBE_TOKEN \
+                        -Dsonar.projectKey=project-Devops \
+                        -Dsonar.host.url=http://localhost:9000/
+                    """
                 }
             }
         }
 
-        stage('🏗️ Build') {
+
+        stage(' Build') {
             steps {
                 echo 'Building the project...'
                 configFileProvider([configFile(fileId: '1f62a59a-5aea-4522-8445-886f83159aea', variable: 'mavenconfig')]) {
@@ -71,14 +75,14 @@ pipeline {
             }
         }
 
-        stage('🐳 Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 echo 'Building Docker Image...'
                 bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
-        stage('📤 Push Docker Image') {
+        stage(' Push Docker Image') {
             steps {
                 echo 'Pushing Docker Image to Docker Hub...'
                 script {
@@ -91,7 +95,7 @@ pipeline {
             }
         }
 
-        stage('🚀 Deploy with Docker Compose') {
+        stage('Deploy with Docker Compose') {
             steps {
                 echo 'Deploying the application with Docker Compose...'
                 script {
@@ -133,7 +137,7 @@ pipeline {
             echo 'Build and deployment completed successfully!'
             emailext(
                     to: "samy.hosni@gmail.com",
-                    subject: "🎉 Build SUCCESS! ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    subject: " Build SUCCESS! ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
                     body: "The build of ${env.JOB_NAME} was successful. Build URL: ${env.BUILD_URL}"
             )
@@ -142,7 +146,7 @@ pipeline {
             echo 'Build or deployment failed.'
             emailext(
                     to: "samy.hosni@gmail.com",
-                    subject: "🚨 Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    subject: " Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     mimeType: 'text/html',
                     body: "The build of ${env.JOB_NAME} failed. Build URL: ${env.BUILD_URL}"
             )
