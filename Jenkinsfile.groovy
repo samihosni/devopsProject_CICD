@@ -114,6 +114,15 @@ pipeline {
             }
         }
 
+        stage('Prometheus Scrape') {
+            steps {
+                script {
+                    // Trigger Prometheus to scrape the app metrics
+                    bat "curl http://localhost:8080/actuator/prometheus"  // Adjust the URL based on your app's metrics endpoint
+                }
+            }
+        }
+
         stage('Publish to Nexus') {
             steps {
                 script {
