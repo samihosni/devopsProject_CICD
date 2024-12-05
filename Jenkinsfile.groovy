@@ -51,20 +51,20 @@ pipeline {
             }
         }
 
-        stage(' SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 echo 'Analyzing the project with SonarQube...'
-                withSonarQubeEnv('SonarQube') {
-                    bat"""
-                    mvn clean install sonar:sonar \
-                        -Dsonar.login=$SONARQUBE_TOKEN \
-                        -Dsonar.projectKey=project-Devops \
-                        -Dsonar.host.url=http://localhost:9000
 
-                    """
+                // Define the Maven tool
+                def mvn = tool 'maven'
+
+                // Run SonarQube analysis
+                withSonarQubeEnv() {
+                    bat "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=project-Devops -Dsonar.projectName='project-Devops'"
                 }
             }
         }
+
 
 
         stage(' Build') {
