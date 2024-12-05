@@ -56,7 +56,7 @@ pipeline {
                 echo 'Analyzing the project with SonarQube...'
                 withSonarQubeEnv('SonarQube') {
                     bat"""
-                    mvn sonar:sonar \
+                    mvn clean install sonar:sonar \
                         -Dsonar.login=$SONARQUBE_TOKEN \
                         -Dsonar.projectKey=project-Devops \
                         -Dsonar.host.url=http://host.docker.internal:9000
