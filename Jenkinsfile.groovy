@@ -118,7 +118,7 @@ pipeline {
             steps {
                 script {
                     // Trigger Prometheus to scrape the app metrics
-                    bat "curl http://localhost:8080/actuator/prometheus"  // Adjust the URL based on your app's metrics endpoint
+                    bat "curl http://app:8080/actuator/prometheus"  // Adjust the URL based on your app's metrics endpoint
                 }
             }
         }
