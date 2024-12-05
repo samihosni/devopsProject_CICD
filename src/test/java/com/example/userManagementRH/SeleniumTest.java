@@ -13,7 +13,7 @@ public class SeleniumTest {
         options.addArguments("--disable-dev-shm-usage");  // Prevents errors in some environments
         WebDriver driver = new ChromeDriver(options);
 
-        driver.get("http://localhost:8081");  // URL of your app
+        driver.get("http://localhost:8083");  // URL of your app
         System.out.println("Page title is: " + driver.getTitle());
         driver.quit();
     }
