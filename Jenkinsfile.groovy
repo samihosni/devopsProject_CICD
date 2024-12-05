@@ -51,19 +51,23 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Selenium Tests') {
             steps {
-                echo 'Analyzing the project with SonarQube...'
-
-                // Define the Maven tool
-                def mvn = tool 'maven'
-
-                // Run SonarQube analysis
-                withSonarQubeEnv() {
-                    bat "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=project-Devops -Dsonar.projectName='project-Devops'"
+                echo 'Running Selenium tests...'
+                script {
+                    // Assuming your Selenium tests are in the src/test/java directory
+                    // and have a test class like SeleniumTest.java
+                    bat 'mvn test -Dtest=SeleniumTest'  // Adjust to your actual test class
+                }
+            }
+            post {
+                always {
+                    echo 'Collecting Selenium test results...'
+                    junit '**/target/surefire-reports/*.xml' // Adjust path if needed
                 }
             }
         }
+
 
 
 
