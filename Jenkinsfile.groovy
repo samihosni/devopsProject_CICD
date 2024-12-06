@@ -114,6 +114,19 @@ pipeline {
             }
         }
 
+        stage('Push Prometheus Metrics') {
+            steps {
+                script {
+                    // Example of sending build data to Prometheus (you can use metrics libraries in your app)
+                    // For Jenkins, Prometheus metrics plugin is scraping from /prometheus endpoint automatically
+
+                    // You can trigger a manual push to a custom Prometheus endpoint if needed
+                    echo 'Pushing Prometheus metrics for the build.'
+                    bat 'curl http://localhost:8080/prometheus/metrics'  // Make sure Prometheus plugin is installed in Jenkins
+                }
+            }
+        }
+
         stage('Publish to Nexus') {
             steps {
                 script {

@@ -15,6 +15,8 @@ services:
     depends_on:
       - db
       - maildev
+    networks:
+      - monitoring
 
   db:
     image: postgres:latest
@@ -24,6 +26,8 @@ services:
       POSTGRES_DB: RH
     ports:
       - "5433:5432"
+    networks:
+      - monitoring
 
   maildev:
     image: maildev/maildev
@@ -44,4 +48,21 @@ services:
     networks:
       - monitoring
 
+  # Prometheus service for scraping metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount the prometheus.yml config file
+    depends_on:
+      - app  # Make sure your app is up and running before Prometheus starts scraping
+    networks:
+      - monitoring
 
+
+networks:
+  monitoring:
+    driver: bridge
