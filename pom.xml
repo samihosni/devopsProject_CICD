@@ -131,7 +131,11 @@
             <artifactId>selenium-java</artifactId>
             <version>4.0.0</version> <!-- Use the version you need -->
         </dependency>
-        <!-- You might also want other dependencies like TestNG or JUnit -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
