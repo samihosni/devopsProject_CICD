@@ -15,6 +15,8 @@ services:
     depends_on:
       - db
       - maildev
+    networks:
+      - monitoring
 
   db:
     image: postgres:latest
@@ -24,6 +26,8 @@ services:
       POSTGRES_DB: RH
     ports:
       - "5433:5432"
+    networks:
+      - monitoring
 
   maildev:
     image: maildev/maildev
@@ -39,25 +43,12 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount the prometheus.yml config file
     depends_on:
-      - app
+      - app  # Make sure your app is up and running before Prometheus starts scraping
     networks:
       - monitoring
 
-  # Grafana service to visualize metrics
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: "admin"  # Default admin password
-    depends_on:
-      - prometheus
-    networks:
-      - monitoring
 
 networks:
   monitoring:

@@ -4,9 +4,19 @@ global:
 scrape_configs:
   - job_name: 'app'
     static_configs:
-      - targets: ['app:8080']  # Your app's Prometheus metrics endpoint
+      - targets: ['app:8080']  # The app service in your Docker Compose file
+      # Add a metrics endpoint if your app exposes Prometheus-compatible metrics
 
-  # Optionally, add Jenkins as a scrape target if you've installed the Prometheus plugin in Jenkins
+  # Optionally, add Jenkins as a scrape target if you're using Jenkins
   - job_name: 'jenkins'
     static_configs:
-      - targets: ['jenkins:8080/prometheus']
+      - targets: ['localhost:8080/prometheus']  # Jenkins metrics endpoint
+  # Scrape metrics from the 'db' container (PostgreSQL)
+  - job_name: 'db'
+    static_configs:
+      - targets: ['db:5432']  # Scrape from the db container (e.g., for database metrics)
+
+  # Scrape metrics from the 'prometheus' container
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']  # Scrape from the Prometheus metrics endpoint
