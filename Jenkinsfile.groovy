@@ -122,7 +122,7 @@ pipeline {
 
                     // You can trigger a manual push to a custom Prometheus endpoint if needed
                     echo 'Pushing Prometheus metrics for the build.'
-                    bat 'curl http://jenkins:8080/prometheus/metrics'  // Make sure Prometheus plugin is installed in Jenkins
+                    bat 'curl http://app:8080/prometheus/metrics'  // Make sure Prometheus plugin is installed in Jenkins
                 }
             }
         }
