@@ -15,6 +15,8 @@ services:
     depends_on:
       - db
       - maildev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - monitoring
 
@@ -48,19 +50,7 @@ services:
     networks:
       - monitoring
 
-  # Prometheus service for scraping metrics
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    restart: always
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount the prometheus.yml config file
-    depends_on:
-      - app  # Make sure your app is up and running before Prometheus starts scraping
-    networks:
-      - monitoring
+
 
 
 networks:
