@@ -10,7 +10,7 @@ scrape_configs:
   # Optionally, add Jenkins as a scrape target if you're using Jenkins
   - job_name: 'jenkins'
     static_configs:
-      - targets: ['localhost:8080/prometheus']  # Jenkins metrics endpoint
+      - targets: ['host.docker.internal:8080/prometheus']  # Jenkins metrics endpoint
   # Scrape metrics from the 'db' container (PostgreSQL)
   - job_name: 'db'
     static_configs:
