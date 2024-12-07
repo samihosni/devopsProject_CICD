@@ -106,7 +106,7 @@ pipeline {
                 script {
                     bat """
                         echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
-                        docker-compose down
+                        
                         docker-compose up -d
                         docker logout
                     """
